@@ -15,6 +15,7 @@ djangorestframework = "^3.15.2"
 markdown = "^3.7"
 django-filter = "^25.1"
 ruff = "^0.10.0"
+django-debug-toolbar = "^5.0.1"
 
 
 [build-system]
