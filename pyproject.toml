@@ -1,20 +1,18 @@
-[project]
+[tool.poetry]
 name = "google-locdest"
 version = "0.1.0"
-description = ""
-authors = [
-    {name = "Your Name",email = "you@example.com"}
-]
+description = "get location dest from google"
+authors = ["amir_espahbodi <dev.amir.espahbodi@gmail.com>"]
 readme = "README.md"
-requires-python = ">=3.13"
-dependencies = [
-    "django (>=5.1.7,<6.0.0)"
-]
 
-[tool.poetry]
-packages = [{include = "google_locdest", from = "src"}]
+[tool.poetry.dependencies]
+python = "^3.13"
+django = "^5.1.7"
+environs = "^14.1.1"
+psycopg2-binary = "^2.9.10"
+gunicorn = "^23.0.0"
 
 
 [build-system]
-requires = ["poetry-core>=2.0.0,<3.0.0"]
+requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
