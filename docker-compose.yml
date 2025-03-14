@@ -2,7 +2,7 @@
 services:
   web:
     build: .
-    command: poetry run gunicorn django_config.asgi:application  -w 4 --threads 8 -k django_config.uvicorn_worker.CustomWorker --bind 0.0.0.0:8000 --workers 4
+    command: poetry run gunicorn django_config.asgi:application  --workers 4 --threads 8 --worker-class django_config.uvicorn_worker.CustomWorker --bind 0.0.0.0:8000
     env_file:
      ./.env
     ports:
