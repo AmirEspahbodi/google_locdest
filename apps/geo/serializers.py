@@ -2,19 +2,12 @@ from rest_framework import serializers
 
 
 class RequestGeoAddressDistance(serializers.Serializer):
-    address1 = serializers.CharField(max_length=256)
-    address2 = serializers.CharField(max_length=256)
-
-
-class RequestGeoCoordinateDistance(serializers.Serializer):
-    latitude1 = serializers.DecimalField(max_digits=9, decimal_places=6)
-    longitude1 = serializers.DecimalField(max_digits=9, decimal_places=6)
-
-    latitude2 = serializers.DecimalField(max_digits=9, decimal_places=6)
-    longitude2 = serializers.DecimalField(max_digits=9, decimal_places=6)
+    origin = serializers.CharField(max_length=256)
+    destination = serializers.CharField(max_length=256)
 
 
 class ResponseGeoLocationDistance(serializers.Serializer):
-    km = serializers.FloatField()
-    formatted_address1 = serializers.CharField(max_length=256)
-    formatted_address2 = serializers.CharField(max_length=256)
+    formatted_origin = serializers.CharField(max_length=256)
+    formatted_destination = serializers.CharField(max_length=256)
+    distance_text = serializers.CharField(max_length=256)
+    distance_meters = serializers.CharField(max_length=256)

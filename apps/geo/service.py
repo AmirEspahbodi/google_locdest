@@ -5,16 +5,17 @@ import asyncio
 from random import random
 from django.conf import settings
 
-logger = logging.getLogger(__name__)
-        
 
-async def format_addresses(addresses):
+logger = logging.getLogger(__name__)
+
+
+async def get_data_from_google_map(origin, destination):
     """
     Format addresses using Google Maps Geocoding API
-    
+
     Args:
         addresses (list): List of address strings
-        
+
     Returns:
         list: List of formatted addresses
     """
@@ -22,39 +23,68 @@ async def format_addresses(addresses):
     api_key = settings.GOOGLE_MAP_API_KEY
     if not api_key:
         raise ValueError("Google Maps API key not found in environment variables")
-    
-    formatted_addresses = []
-    
+
     async with httpx.AsyncClient() as alient:
         responses_coroutine = []
-        for address in addresses:
-            # Call the Geocoding API
-            endpoint = "https://maps.googleapis.com/maps/api/geocode/json"
-            params = {
-                "address": address,
-                "key": api_key
-            }
-            responses_coroutine.append(alient.get(endpoint, params=params))
-        responses:list[Response] = await asyncio.gather(*responses_coroutine)
+        # Call the Geocoding API
+        endpoint = "https://maps.googleapis.com/maps/api/geocode/json"
 
-    for response in responses:
+        responses_coroutine.extend(
+            [
+                alient.get(endpoint, params={"address": origin, "key": api_key}),
+                alient.get(endpoint, params={"address": destination, "key": api_key}),
+                alient.get(
+                    "https://maps.googleapis.com/maps/api/directions/json",
+                    params={
+                        "origin": origin,
+                        "destination": destination,
+                        "alternatives": "true",
+                        "key": api_key,
+                    },
+                ),
+            ]
+        )
+
+        responses: list[Response] = await asyncio.gather(*responses_coroutine)
+
+    result = []
+    # get properly formatted addressi
+    for response in responses[:2]:
         data = response.json()
         if data["status"] == "OK":
             # Get the formatted address from the first result
             formatted_address = data["results"][0]["formatted_address"]
-            formatted_addresses.append(formatted_address)
+            result.append(formatted_address)
         else:
-            formatted_addresses.append(f"Error: {data['status']}")
+            result.append(f"Error: {data['status']}")
+
+    # get
+    distance_response = responses[2]
+    if distance_response.status_code != 200:
+        raise Exception(
+            f"Distance Matrix request failed with status {distance_response.status_code} {distance_response.json()}"
+        )
+
+    distance_data = distance_response.json()
+    if distance_data.get("status") == "OK":
+        shortest_route = min(distance_data["routes"], key=lambda route: route["legs"][0]["distance"]["value"])
+        result.append(shortest_route["legs"][0]["distance"]["text"])
+        result.append(shortest_route["legs"][0]["distance"]["value"])
     
-    return formatted_addresses
+    else:
+        print(distance_data)
+        raise Exception(f"Distance Matrix error: {distance_data.get('status')}")
 
-async def fetch_distance_by_addresses_data(address1, address2):
-    formatted_address1, formatted_address2 = await format_addresses([address1, address2])
+    return result
+
+
+async def fetch_distance_by_addresses_data(origin, destination):
+    formatted_origin, formatted_destination, distance_text, distance_meters = await get_data_from_google_map(
+        origin, destination
+    )
     return {
-        'km': 10*random(),
-        "formatted_address1": formatted_address1,
-        "formatted_address2": formatted_address2
+        "formatted_origin": formatted_origin,
+        "formatted_destination": formatted_destination,
+        "distance_text": distance_text,
+        "distance_meters": distance_meters
     }
-
-"5555 E Washington Blvd, Commerce, CA 90040, United States"
-"US-95, Las Vegas, NV 89104, USA"

@@ -42,11 +42,9 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    
     "rest_framework",
-    'drf_spectacular',
-
-    "apps.geo"
+    "drf_spectacular",
+    "apps.geo",
 ]
 
 MIDDLEWARE = [
@@ -140,36 +138,36 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Logging configuration
 LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'verbose': {
-            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
-            'style': '{',
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "verbose": {
+            "format": "{levelname} {asctime} {module} {process:d} {thread:d} {message}",
+            "style": "{",
         },
     },
-    'handlers': {
-        'console': {
-            'class': 'logging.StreamHandler',
-            'formatter': 'verbose',
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "verbose",
         },
     },
-    'root': {
-        'handlers': ['console'],
-        'level': 'INFO',
+    "root": {
+        "handlers": ["console"],
+        "level": "INFO",
     },
 }
 
 REST_FRAMEWORK = {
     # YOUR SETTINGS
-    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
 
 SPECTACULAR_SETTINGS = {
-    'TITLE': 'Geometric Distance API',
-    'DESCRIPTION': 'Geometric Distance description',
-    'VERSION': '0.1.0',
-    'SERVE_INCLUDE_SCHEMA': False,
+    "TITLE": "Geometric Distance API",
+    "DESCRIPTION": "Geometric Distance description",
+    "VERSION": "0.1.0",
+    "SERVE_INCLUDE_SCHEMA": False,
 }
 
-GOOGLE_MAP_API_KEY=env.str("GOOGLE_MAP_API_KEY")
+GOOGLE_MAP_API_KEY = env.str("GOOGLE_MAP_API_KEY")

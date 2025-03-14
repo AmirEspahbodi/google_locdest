@@ -3,8 +3,8 @@ from rest_framework.routers import DefaultRouter
 from .views import GeoViewSet
 
 router = DefaultRouter()
-router.register(r'', GeoViewSet, basename='geo')
+router.register(r"", GeoViewSet, basename="geo")
 
 urlpatterns = [
-    path('', include(router.urls)),
+    path("", include(router.urls)),
 ]

@@ -4,10 +4,10 @@ from .base import *
 DEBUG = False
 
 # Production logging: set to WARNING or above
-LOGGING['root']['level'] = 'WARNING'
+LOGGING["root"]["level"] = "WARNING"
 
 # Security settings for production
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 # Additional production-specific settings can be added here, for example:
 # SESSION_COOKIE_SECURE = True

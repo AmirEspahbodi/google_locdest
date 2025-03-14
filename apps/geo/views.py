@@ -20,7 +20,12 @@ logger = logging.getLogger(__name__)
         summary="get geometric distance between two given address in km",
         description="get geometric distance between two given address in km.",
         request=RequestGeoAddressDistance,
-        responses={200: OpenApiResponse(response=ResponseGeoLocationDistance, description="geoaddress data response in km")},
+        responses={
+            200: OpenApiResponse(
+                response=ResponseGeoLocationDistance,
+                description="geoaddress data response in km",
+            )
+        },
     )
 )
 class GeoViewSet(viewsets.ViewSet):
@@ -28,16 +33,20 @@ class GeoViewSet(viewsets.ViewSet):
     def geoaddressdistance(self, request):
         serializer = RequestGeoAddressDistance(data=request.data)
         if serializer.is_valid():
-            address1 = serializer.validated_data["address1"]
-            address2 = serializer.validated_data["address2"]
+            origin = serializer.validated_data["origin"]
+            destination = serializer.validated_data["destination"]
             logger.info("got two valid address")
             try:
-                data = async_to_sync(fetch_distance_by_addresses_data)(address1, address2)
-                return Response(data, status=status.HTTP_200_OK)
+                data = async_to_sync(fetch_distance_by_addresses_data)(
+                    origin, destination
+                )
+                return Response(ResponseGeoLocationDistance(data).data)
             except Exception:
                 logger.exception("Failed to fetch geocode data.")
-                return Response({"error": "Failed to fetch geocode data."},
-                                status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                return Response(
+                    {"error": "Failed to fetch geocode data."},
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                )
         else:
             logger.info("got a invalid address")
         logger.error("Invalid data: %s", serializer.errors)
