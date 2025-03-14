@@ -16,6 +16,7 @@ markdown = "^3.7"
 django-filter = "^25.1"
 ruff = "^0.10.0"
 django-debug-toolbar = "^5.0.1"
+uvicorn = "^0.34.0"
 
 
 [build-system]
