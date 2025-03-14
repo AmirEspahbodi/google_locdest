@@ -1,6 +1,8 @@
 # apps/geo/views.py
 
 import logging
+from asgiref.sync import async_to_sync
+
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -30,7 +32,7 @@ class GeoViewSet(viewsets.ViewSet):
             address1 = serializer.validated_data["address1"]
             address2 = serializer.validated_data["address2"]
             try:
-                data = fetch_distance_by_addresses_data(address1, address2)
+                data = async_to_sync(fetch_distance_by_addresses_data)(address1, address2)
                 return Response(data, status=status.HTTP_200_OK)
             except Exception:
                 logger.exception("Failed to fetch geocode data.")
