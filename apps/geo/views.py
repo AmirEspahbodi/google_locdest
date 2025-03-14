@@ -24,13 +24,13 @@ logger = logging.getLogger(__name__)
     )
 )
 class GeoViewSet(viewsets.ViewSet):
-
     @action(detail=False, methods=["post"], url_path="geoaddress")
     def geoaddressdistance(self, request):
         serializer = RequestGeoAddressDistance(data=request.data)
         if serializer.is_valid():
             address1 = serializer.validated_data["address1"]
             address2 = serializer.validated_data["address2"]
+            logger.info("got two valid address")
             try:
                 data = async_to_sync(fetch_distance_by_addresses_data)(address1, address2)
                 return Response(data, status=status.HTTP_200_OK)
@@ -38,5 +38,7 @@ class GeoViewSet(viewsets.ViewSet):
                 logger.exception("Failed to fetch geocode data.")
                 return Response({"error": "Failed to fetch geocode data."},
                                 status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        else:
+            logger.info("got a invalid address")
         logger.error("Invalid data: %s", serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

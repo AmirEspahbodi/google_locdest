@@ -196,6 +196,20 @@ django = ["dj-database-url", "dj-email-url", "django-cache-url"]
 tests = ["backports.strenum", "environs[django]", "packaging", "pytest"]
 
 [[package]]
+name = "faker"
+version = "37.0.0"
+description = "Faker is a Python package that generates fake data for you."
+optional = false
+python-versions = ">=3.9"
+files = [
+    {file = "faker-37.0.0-py3-none-any.whl", hash = "sha256:2598f78b76710a4ed05e197dda5235be409b4c291ba5c9c7514989cfbc7a5144"},
+    {file = "faker-37.0.0.tar.gz", hash = "sha256:d2e4e2a30d459a8ec0ae52a552aa51c48973cb32cf51107dee90f58a8322a880"},
+]
+
+[package.dependencies]
+tzdata = "*"
+
+[[package]]
 name = "gunicorn"
 version = "23.0.0"
 description = "WSGI HTTP Server for UNIX"
@@ -767,4 +781,4 @@ brotli = ["brotli"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.13"
-content-hash = "5682bfb3bcfdf7107a8f833d19a95d469695716d0bf6cee4d76ae071388e4ed9"
+content-hash = "ced32b05ffa46a028a32eeba891c9ac166ee25e0f28c3eb9cc88d1eaa70db541"

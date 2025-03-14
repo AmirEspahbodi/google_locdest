@@ -20,6 +20,7 @@ uvicorn = "^0.34.0"
 httpx = "^0.28.1"
 whitenoise = "^6.9.0"
 drf-spectacular = "^0.28.0"
+faker = "^37.0.0"
 
 
 [build-system]

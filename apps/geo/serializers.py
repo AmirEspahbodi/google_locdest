@@ -2,8 +2,8 @@ from rest_framework import serializers
 
 
 class RequestGeoAddressDistance(serializers.Serializer):
-    address1 = serializers.CharField(max_length=64)
-    address2 = serializers.CharField(max_length=64)
+    address1 = serializers.CharField(max_length=256)
+    address2 = serializers.CharField(max_length=256)
 
 
 class RequestGeoCoordinateDistance(serializers.Serializer):
@@ -16,3 +16,5 @@ class RequestGeoCoordinateDistance(serializers.Serializer):
 
 class ResponseGeoLocationDistance(serializers.Serializer):
     km = serializers.FloatField()
+    formatted_address1 = serializers.CharField(max_length=256)
+    formatted_address2 = serializers.CharField(max_length=256)
