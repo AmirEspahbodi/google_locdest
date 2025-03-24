@@ -5,6 +5,8 @@ services:
     command: poetry run gunicorn django_config.asgi:application  --workers 4 --threads 8 --worker-class django_config.uvicorn_worker.CustomWorker --bind 0.0.0.0:8000
     env_file:
      ./.env
+    volumes:
+     - ./geo:/home/python_user/geo
     ports:
       - "8000:8000"
     depends_on:

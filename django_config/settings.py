@@ -44,10 +44,12 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "drf_spectacular",
-    "apps.geo",
+    "corsheaders",
+    "geo",
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",  # Add this line at the top
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -171,3 +173,6 @@ SPECTACULAR_SETTINGS = {
 }
 
 GOOGLE_MAP_API_KEY = env.str("GOOGLE_MAP_API_KEY")
+
+CORS_ALLOWED_ORIGINS = env.list("DJANGO_CORS_ALLOWED_ORIGINS")
+CORS_ALLOW_ALL_ORIGINS = True

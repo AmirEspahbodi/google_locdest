@@ -8,6 +8,10 @@ class RequestGeoAddressDistance(serializers.Serializer):
 
 class ResponseGeoLocationDistance(serializers.Serializer):
     formatted_origin = serializers.CharField(max_length=256)
+    origin_latitude = serializers.CharField(max_length=256)
+    origin_longitude = serializers.CharField(max_length=256)
     formatted_destination = serializers.CharField(max_length=256)
+    destination_latitude = serializers.CharField(max_length=256)
+    destination_longitude = serializers.CharField(max_length=256)
     distance_text = serializers.CharField(max_length=256)
     distance_meters = serializers.CharField(max_length=256)

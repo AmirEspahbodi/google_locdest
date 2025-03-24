@@ -13,19 +13,23 @@ class Geolocation(models.Model):
     This can be used to track queries for analytics or debugging purposes.
     """
 
-    input_address = models.CharField(max_length=255)
-    formatted_address = models.CharField(max_length=255, blank=True, null=True)
+    input_address = models.CharField(max_length=255, unique=True, db_index=True)
+    formatted_address = models.CharField(
+        max_length=255, blank=True, null=True, unique=True, db_index=True
+    )
     latitude = models.DecimalField(
-        max_digits=9, decimal_places=6, blank=True, null=True, db_index=True
+        max_digits=13,
+        decimal_places=10,
+        blank=True,
+        null=True,
     )
     longitude = models.DecimalField(
-        max_digits=9, decimal_places=6, blank=True, null=True, db_index=True
+        max_digits=13,
+        decimal_places=10,
+        blank=True,
+        null=True,
     )
     created_at = models.DateTimeField(auto_now_add=True)
-
-    def save(self, *args, **kwargs):
-        logger.info("Saving GeolocationRequest for address: %s", self.input_address)
-        super().save(*args, **kwargs)
 
     def __str__(self):
         return (
@@ -44,7 +48,8 @@ class GeolocationsDistance(models.Model):
     geolocation2 = models.ForeignKey(
         Geolocation, related_name="distance_as_second", on_delete=models.CASCADE
     )
-    distance_km = models.FloatField()
+    distance_text = models.CharField(max_length=32)
+    distance_metter = models.FloatField()
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

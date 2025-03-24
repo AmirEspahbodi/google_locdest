@@ -63,7 +63,8 @@ RUN poetry install --no-interaction --no-cache
 FROM example-app-base AS example-app-final
 
 COPY django_config/ $APP_HOME/django_config/
-COPY apps/ $APP_HOME/apps/
+COPY geo/ $APP_HOME/geo/
 COPY manage.py $APP_HOME/manage.py
+COPY pytest.ini $APP_HOME/pytest.ini
 
 EXPOSE 8000

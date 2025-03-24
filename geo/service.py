@@ -54,7 +54,9 @@ async def get_data_from_google_map(origin, destination):
         if data["status"] == "OK":
             # Get the formatted address from the first result
             formatted_address = data["results"][0]["formatted_address"]
-            result.append(formatted_address)
+            lat = data["results"][0]["geometry"]["location"]["lat"]
+            lng = data["results"][0]["geometry"]["location"]["lng"]
+            result.extend([formatted_address, lat, lng])
         else:
             result.append(f"Error: {data['status']}")
 
@@ -67,10 +69,13 @@ async def get_data_from_google_map(origin, destination):
 
     distance_data = distance_response.json()
     if distance_data.get("status") == "OK":
-        shortest_route = min(distance_data["routes"], key=lambda route: route["legs"][0]["distance"]["value"])
+        shortest_route = min(
+            distance_data["routes"],
+            key=lambda route: route["legs"][0]["distance"]["value"],
+        )
         result.append(shortest_route["legs"][0]["distance"]["text"])
         result.append(shortest_route["legs"][0]["distance"]["value"])
-    
+
     else:
         print(distance_data)
         raise Exception(f"Distance Matrix error: {distance_data.get('status')}")
@@ -79,12 +84,23 @@ async def get_data_from_google_map(origin, destination):
 
 
 async def fetch_distance_by_addresses_data(origin, destination):
-    formatted_origin, formatted_destination, distance_text, distance_meters = await get_data_from_google_map(
-        origin, destination
-    )
+    (
+        formatted_origin,
+        origin_latitude,
+        origin_longitude,
+        formatted_destination,
+        destination_latitude,
+        destination_longitude,
+        distance_text,
+        distance_meters,
+    ) = await get_data_from_google_map(origin, destination)
     return {
         "formatted_origin": formatted_origin,
+        "origin_latitude": origin_latitude,
+        "origin_longitude": origin_longitude,
         "formatted_destination": formatted_destination,
+        "destination_latitude": destination_latitude,
+        "destination_longitude": destination_longitude,
         "distance_text": distance_text,
-        "distance_meters": distance_meters
+        "distance_meters": distance_meters,
     }
