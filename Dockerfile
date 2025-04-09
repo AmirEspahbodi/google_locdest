@@ -2,69 +2,80 @@
 FROM python:3.13.2-slim-bullseye AS python-base
 
 
+# Define application directory and user
 ENV APP_HOME=/home/python_user
+ENV APP_USER=python_user
 
-# ENV APP_USER=python_user
-# RUN adduser --disabled-password --gecos "" $APP_USER && chown -R $APP_USER:$APP_USER $APP_HOME
-# RUN usermod -aG sudo $APP_USER
-# USER $APP_USER
+
+RUN adduser --disabled-password --gecos "" $APP_USER
+RUN chown -R $APP_USER:$APP_USER $APP_HOME 
 
 WORKDIR $APP_HOME
 
-ENV TZ 'Asia/Tehran'
+# Set timezone and install tzdata
+ENV TZ='Asia/Tehran'
 RUN echo $TZ > /etc/timezone && apt-get update && \
-    apt-get install -y tzdata && \
-    rm /etc/localtime && \
+    apt-get install -y --no-install-recommends tzdata && \
+    rm -f /etc/localtime && \
     ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
     dpkg-reconfigure -f noninteractive tzdata && \
-    apt-get clean
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# set environment variables
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
+# Set environment variables to optimize Python runtime
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
 
-# https://python-poetry.org/docs#ci-recommendations
-ENV POETRY_VERSION=1.8.4
+# Poetry environment variables (fixed typo)
+ENV POETRY_VERSION=2.1.1
 ENV POETRY_HOME=$APP_HOME/poetry
 ENV POETRY_VENV=$APP_HOME/poetry-venv
-
-# Tell Poetry where to place its cache and virtual environment
-ENV POETRY_C8000ACHE_DIR=$APP_HOME/.poetry-cache
+ENV POETRY_CACHE_DIR=$APP_HOME/.poetry-cache
 
 # Upgrade pip
 RUN pip install --upgrade pip
 
-# Create a new stage from the base python image
+# Switch to non-root user for added security
+USER $APP_USER
+
+# ------------------------------------------------------------------
+# Stage: Poetry Environment Setup
+# ------------------------------------------------------------------
 FROM python-base AS poetry-base
 
-# Creating a virtual environment just for poetry and install it with pip
-RUN python3 -m venv $POETRY_VENV 
-RUN $POETRY_VENV/bin/pip install -U pip setuptools 
-RUN $POETRY_VENV/bin/pip install poetry==${POETRY_VERSION}
+# Create a virtual environment for Poetry and install it
+RUN python3 -m venv $POETRY_VENV && \
+    $POETRY_VENV/bin/pip install --upgrade pip setuptools && \
+    $POETRY_VENV/bin/pip install poetry==$POETRY_VERSION
 
-# Create a new stage from the base python image
+# ------------------------------------------------------------------
+# Stage: Application Dependency Installation
+# ------------------------------------------------------------------
 FROM python-base AS example-app-base
 
-# Copy Poetry to django_core image
+# Copy Poetry virtual environment from previous stage
 COPY --from=poetry-base ${POETRY_VENV} ${POETRY_VENV}
 
 # Add Poetry to PATH
 ENV PATH="${PATH}:${POETRY_VENV}/bin"
 
-# copy dependency
-COPY ./pyproject.toml ./README.md $APP_HOME
+# Copy dependency files with proper ownership
+COPY --chown=$APP_USER:$APP_USER ./pyproject.toml ./README.md $APP_HOME/
 
-# [OPTIONAL] Validate the project is properly configured
+# Validate project configuration
 RUN poetry check
 
-# Install Dependencies
-RUN poetry install --no-interaction --no-cache
+# Install project dependencies (without installing the project package itself)
+RUN poetry install --no-interaction --no-cache --no-root
 
+# ------------------------------------------------------------------
+# Stage: Final Application Image
+# ------------------------------------------------------------------
 FROM example-app-base AS example-app-final
 
-COPY django_config/ $APP_HOME/django_config/
-COPY geo/ $APP_HOME/geo/
-COPY manage.py $APP_HOME/manage.py
-COPY pytest.ini $APP_HOME/pytest.ini
+# Copy application source code with proper ownership
+COPY --chown=$APP_USER:$APP_USER django_config/ $APP_HOME/django_config/
+COPY --chown=$APP_USER:$APP_USER geo/ $APP_HOME/geo/
+COPY --chown=$APP_USER:$APP_USER manage.py $APP_HOME/manage.py
+COPY --chown=$APP_USER:$APP_USER pytest.ini $APP_HOME/pytest.ini
 
 EXPOSE 8000
